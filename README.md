@@ -5,5 +5,5 @@ Python tool to email plex shared users
 
 Run with python3.x
 
-python3 main.py
+    python3 main.py
 
