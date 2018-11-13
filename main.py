@@ -8,12 +8,12 @@ from mail_send import send_mail
 
 #Plex Setup
 plex_username = 'theslimone'
-plex_password = 'nickisawesome420'
+plex_password = 'xxxxx'
 #End Plex Setup
 
 #SMTP Setup
 email_username = 'nick@shoresmedia.com'
-email_password = 'Jo5R58KOKtRV'
+email_password = 'xxxxx'
 email_host = 'smtp.office365.com'
 email_from = 'nick@shoresmedia.com'
 email_port = '587'
