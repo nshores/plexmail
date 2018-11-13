@@ -20,10 +20,12 @@ parser.add_argument('-p','--password', help='MyPlex Password')
 parser.add_argument('--smtp_server', help='SMTP Server')
 parser.add_argument('--smtp_username', help='SMTP Username')
 parser.add_argument('--smtp_password', help='SMTP Password')
-parser.add_argument('--smpt_port', help='SMTP Port')
+parser.add_argument('--smtp_port', help='SMTP Port')
 parser.add_argument('--smtp_send_as', help='SMTP Send-As User')
 parser.add_argument('-t','--target_user', help='Email one specific user')
 parser.add_argument('-d','--dump', help='Dump All User information to file')
+parser.add_argument('-c','--config', help='Custom Config File')
+parser.add_argument('--send_email', help='Send emails, true or false (default to true)', action='store_true')
 args = parser.parse_args()
 
 #Dry run flag
@@ -33,12 +35,12 @@ if args.whatif == True:
      WhatIf = True
      print('---Dry Run Enabled---- \n')
 
-# Load the configuration file
-if os.path.isfile('config.ini'):
-    print("Found local configuration file\n")
+# Load custom config
+if args.config:
+    config_location = args.config
+    print("Loading custom configuration")
     config = configparser.ConfigParser()
-    config.read('config.ini')
-    #CONFIG
+    config.read(config_location)
     plex_username = config['plex']['plex_username']
     plex_password = config['plex']['plex_password']
     email_username = config['email']['email_username']
@@ -47,12 +49,41 @@ if os.path.isfile('config.ini'):
     email_from = config['email']['email_from']
     email_port = config['email']['email_port']
     email_body = config['email']['email_body']
-    #CONFIG
+
+#try to load default config
+elif os.path.isfile('config.ini'):
+    print("Found local configuration file\n")
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    plex_username = config['plex']['plex_username']
+    plex_password = config['plex']['plex_password']
+    email_username = config['email']['email_username']
+    email_password = config['email']['email_password']
+    email_host = config['email']['email_host']
+    email_from = config['email']['email_from']
+    email_port = config['email']['email_port']
+    email_body = config['email']['email_body']
+
 else:
+    #Parse command line configuration options
     print("No configuration found -- using command line arguments\n")
     #Replace regular email body from template with a parmater
     if args.notice:
-        config['email']['email_body'] = args.notice
+        email_body = args.notice
+    if args.username:
+        plex_username = args.username
+    if args.password:
+        plex_password = args.password
+    if args.smtp_username:
+        email_username = args.smtp_username
+    if args.smtp_password:
+        email_password = args.smtp_password
+    if args.smtp_server:
+        email_host = args.smtp_server
+    if args.smtp_port:
+        email_port = args.smtp_port
+    if args.smtp_send_as:
+        email_from = args.smtp_send_as
 
 
 
@@ -60,10 +91,10 @@ else:
 print("Logging into MyPlex\n")
 try:
     plex = MyPlexAccount(plex_username, plex_password)
+    print("...Success\n")
 except plexapi.exceptions.BadRequest as err:
     print("MyPlex Login Error: {0}\n".format(err))
-    print("Stopping Script")
-
+    print("Stopping Script")    
     sys.exit()
 
 def plex_email_list():
