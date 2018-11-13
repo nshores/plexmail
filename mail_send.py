@@ -20,3 +20,5 @@ def send_mail(email_host, email_port, email_username, email_password, send_to_ad
 
     # send the message via the server set up earlier.
     s.send_message(msg)
+
+    s.quit()
