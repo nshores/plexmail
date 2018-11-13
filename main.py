@@ -7,15 +7,15 @@ from plexapi.myplex import MyPlexAccount
 from mail_send import send_mail
 
 #Plex Setup
-plex_username = 'theslimone'
+plex_username = 'xxxx'
 plex_password = 'xxxxx'
 #End Plex Setup
 
 #SMTP Setup
-email_username = 'nick@shoresmedia.com'
+email_username = 'xxxx'
 email_password = 'xxxxx'
 email_host = 'smtp.office365.com'
-email_from = 'nick@shoresmedia.com'
+email_from = 'xxxx'
 email_port = '587'
 #TODO - Replace with template
 email_body = 'Nothing to see here yet'
