@@ -14,4 +14,7 @@ setup to take args
             port
             username
             password
+    Error handling 
+        Validating params
+
 
