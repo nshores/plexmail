@@ -25,7 +25,7 @@ parser.add_argument('--smtp_send_as', help='SMTP Send-As User')
 parser.add_argument('-t','--target_user', help='Email one specific user')
 parser.add_argument('-d','--dump', help='Dump All User information to file')
 parser.add_argument('-c','--config', help='Custom Config File')
-parser.add_argument('--disable_email', help='Set to disable sending emails', default=True, action='store_false')
+parser.add_argument('--disable_email', help='Set to disable sending emails', default=False, action='store_true')
 args = parser.parse_args()
 
 #Dry run flag
@@ -35,11 +35,12 @@ if args.whatif == True:
      print('---Dry Run Enabled---- ')
 
 #Email flag
-if args.disable_email == True:
-     disable_email = True
+
+if args.disable_email == False:
+     disable_email = False
      print('---Email Sending Enabled---- \n')
 else:
-    disable_email = False
+    disable_email = True
 
 # Load custom config
 if args.config:
@@ -129,8 +130,10 @@ def plex_email_list():
     return emaillist
 
 #EMAIL CREATION SECTION
-if disable_email == True:
+#Check to see if email is disabled with a flag
+if disable_email == False:
     #Send email flag is set, let's create an email
+    
     #Subject Line
     #Scan for a custom subject line in the config. It doesn't exist, let's make a nice default by grabbing the local plex server name.
     if not email_subject:
@@ -146,7 +149,7 @@ def main():
     user_email_list = plex_email_list()
 
     #Decide what to do
-    if disable_email == True:
+    if disable_email == False:
         #Send some emails
         for user in user_email_list:
             send_to_address = user
