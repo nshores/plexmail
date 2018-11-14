@@ -16,5 +16,6 @@ setup to take args
             password
     Error handling 
         Validating params
+Grab server name and stick in message subject
 
 

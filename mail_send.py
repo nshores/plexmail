@@ -2,7 +2,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-def send_mail(email_host, email_port, email_username, email_password, send_to_address, email_body):
+def send_mail(email_host, email_port, email_username, email_password, send_to_address, email_body, email_subject):
     #Login to email server
     s = smtplib.SMTP(host=email_host, port=email_port)
     s.starttls()
@@ -13,7 +13,7 @@ def send_mail(email_host, email_port, email_username, email_password, send_to_ad
     # setup the parameters of the message
     msg['From']=email_username
     msg['To']=send_to_address
-    msg['Subject']="Slim Flix Notification Test"
+    msg['Subject']=email_subject
 
     # add in the message body
     msg.attach(MIMEText(email_body, 'plain'))

@@ -49,6 +49,7 @@ if args.config:
     email_from = config['email']['email_from']
     email_port = config['email']['email_port']
     email_body = config['email']['email_body']
+    email_subject = config['email']['email_subject']
 
 #try to load default config
 elif os.path.isfile('config.ini'):
@@ -63,6 +64,7 @@ elif os.path.isfile('config.ini'):
     email_from = config['email']['email_from']
     email_port = config['email']['email_port']
     email_body = config['email']['email_body']
+    email_subject = config['email']['email_subject']
 
 else:
     #Parse command line configuration options
@@ -87,6 +89,7 @@ else:
 
 
 
+
 #create 'MyPlexAccount' PlexAPI Object
 print("Logging into MyPlex\n")
 try:
@@ -96,6 +99,16 @@ except plexapi.exceptions.BadRequest as err:
     print("MyPlex Login Error: {0}\n".format(err))
     print("Stopping Script")    
     sys.exit()
+
+def plex_server_name():
+    resource = plex.resources()
+    Plex_Server_Name = ""
+    for r in resource:
+        if r.product == 'Plex Media Server' and r.owned == True:
+            Plex_Server_Name = r.name
+    return Plex_Server_Name
+
+    
 
 def plex_email_list():
     #Grab a list of user objects
@@ -108,15 +121,35 @@ def plex_email_list():
         emaillist.append(user.email)
     return emaillist
 
+if args.send_email == True:
+    #Let's create an email
+    #Subject Line
+    #Scan for a custom subject line in the config. It doesn't exist, let's make a nice default by grabbing the local plex server name.
+    if not email_subject:
+        email_subject = 'Notification From {}'.format(plex_server_name())
+    #Body
+    #TODO
+
+#Main program logic
 def main():
+    #call function to grab list of user emails
     user_email_list = plex_email_list()
+
+    #Send some emails
     for user in user_email_list:
         send_to_address = user
         if WhatIf == True:
             print(f"Sending email to {send_to_address} --DRY RUN NOT SENDING EMAIL--")
         else:
             print(f"Sending email to {send_to_address}")
-            #send_mail(email_host, email_port, email_username, email_password, send_to_address, email_body) 
+            send_mail(
+            email_host, 
+            email_port, 
+            email_username, 
+            email_password, 
+            send_to_address, 
+            email_body, 
+            email_subject) 
         
 
 if __name__ == '__main__':
