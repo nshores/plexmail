@@ -25,15 +25,21 @@ parser.add_argument('--smtp_send_as', help='SMTP Send-As User')
 parser.add_argument('-t','--target_user', help='Email one specific user')
 parser.add_argument('-d','--dump', help='Dump All User information to file')
 parser.add_argument('-c','--config', help='Custom Config File')
-parser.add_argument('--send_email', help='Send emails, true or false (default to true)', action='store_true')
+parser.add_argument('--disable_email', help='Set to disable sending emails', default=True, action='store_false')
 args = parser.parse_args()
 
 #Dry run flag
 WhatIf = False
-
 if args.whatif == True:
      WhatIf = True
-     print('---Dry Run Enabled---- \n')
+     print('---Dry Run Enabled---- ')
+
+#Email flag
+if args.disable_email == True:
+     disable_email = True
+     print('---Email Sending Enabled---- \n')
+else:
+    disable_email = False
 
 # Load custom config
 if args.config:
@@ -88,8 +94,6 @@ else:
         email_from = args.smtp_send_as
 
 
-
-
 #create 'MyPlexAccount' PlexAPI Object
 print("Logging into MyPlex\n")
 try:
@@ -100,6 +104,10 @@ except plexapi.exceptions.BadRequest as err:
     print("Stopping Script")    
     sys.exit()
 
+
+#Define Some helper functions 
+
+#Let's grab a server name. Returns LAST match if multiple servers are found.. Fix me at some point..
 def plex_server_name():
     resource = plex.resources()
     Plex_Server_Name = ""
@@ -113,7 +121,6 @@ def plex_server_name():
 def plex_email_list():
     #Grab a list of user objects
     userlist = plex.users()
-
     #create list for email
     emaillist = []
     for user in userlist:
@@ -121,36 +128,42 @@ def plex_email_list():
         emaillist.append(user.email)
     return emaillist
 
-if args.send_email == True:
-    #Let's create an email
+#EMAIL CREATION SECTION
+if disable_email == True:
+    #Send email flag is set, let's create an email
     #Subject Line
     #Scan for a custom subject line in the config. It doesn't exist, let's make a nice default by grabbing the local plex server name.
     if not email_subject:
         email_subject = 'Notification From {}'.format(plex_server_name())
-    #Body
+    #Body Section
     #TODO
+
+#END EMAIL CREATION SECTION
 
 #Main program logic
 def main():
     #call function to grab list of user emails
     user_email_list = plex_email_list()
 
-    #Send some emails
-    for user in user_email_list:
-        send_to_address = user
-        if WhatIf == True:
-            print(f"Sending email to {send_to_address} --DRY RUN NOT SENDING EMAIL--")
-        else:
-            print(f"Sending email to {send_to_address}")
-            send_mail(
-            email_host, 
-            email_port, 
-            email_username, 
-            email_password, 
-            send_to_address, 
-            email_body, 
-            email_subject) 
-        
+    #Decide what to do
+    if disable_email == True:
+        #Send some emails
+        for user in user_email_list:
+            send_to_address = user
+            if WhatIf == True:
+                print(f"Sending email to {send_to_address} --DRY RUN NOT SENDING EMAIL--")
+            else:
+                print(f"Sending email to {send_to_address}")
+                send_mail(
+                email_host, 
+                email_port, 
+                email_username, 
+                email_password, 
+                send_to_address, 
+                email_body, 
+                email_subject) 
+    else:
+        print("Nothing to do!")
 
 if __name__ == '__main__':
     main()
